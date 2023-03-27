@@ -32,7 +32,7 @@ export default function Home() {
   console.log("Contract Address: ", CONTRACT_ADDRESS);
   console.log("Wallet Address: ", address);
 
-  const { config } = usePrepareContractWrite({
+  const { config: mintConfig } = usePrepareContractWrite({
     address: CONTRACT_ADDRESS,
     abi: TokenContract.abi,
     functionName: "mint",
@@ -41,6 +41,35 @@ export default function Home() {
       ethers.utils.parseEther("3"),
     ],
   });
+  const { config: buyConfig } = usePrepareContractWrite({
+    address: CONTRACT_ADDRESS,
+    abi: TokenContract.abi,
+    functionName: "buy",
+    args: [ethers.utils.parseEther("3")],
+    overrides: {
+      value: ethers.utils.parseEther("0.01"),
+    },
+  });
+
+  const { config: faucetConfig } = usePrepareContractWrite({
+    address: CONTRACT_ADDRESS,
+    abi: TokenContract.abi,
+    functionName: "faucet",
+    args: [],
+  });
+
+  const {
+    data: faucetData,
+    write: faucetToken,
+    isLoading: isFaucetLoading,
+    isSuccess: isFaucetStarted,
+    error: faucetError,
+  } = useContractWrite(faucetConfig);
+
+  // claim faucet
+  const claimFaucet = async () => {
+    await faucetToken();
+  };
 
   //Must alias it since the return type of useContractWrite is same each time
   //if not aliased we can't call other write function.
@@ -50,12 +79,25 @@ export default function Home() {
     isLoading: isMintLoading,
     isSuccess: isMintSuccess,
     error: mintError,
-  } = useContractWrite(config);
+  } = useContractWrite(mintConfig);
+
+  const {
+    data: buyData,
+    write: buyToken,
+    isLoading: isBuying,
+    isSuccess: isBuySuccess,
+    error: buyError,
+  } = useContractWrite(buyConfig);
 
   const { isSuccess: mintSuccess, isLoading: mintLoading } =
     useWaitForTransaction({
       confirmations: 1,
       hash: mintData?.hash,
+    });
+  const { isSuccess: faucetSuccess, isLoading: faucetLoading } =
+    useWaitForTransaction({
+      confirmations: 1,
+      hash: faucetData?.hash,
     });
 
   const { data: totalSupplyData } = useContractRead({
@@ -108,6 +150,27 @@ export default function Home() {
             </button>
           </div>
         )}
+        <div className="flex flex-col mb-4 mt-4">
+          <button
+            onClick={() => {
+              buyToken();
+            }}
+            className="bg-gray-900 text-white hover:bg-gray-800 rounded-full px-12 py-2 sm:w-auto"
+          >
+            Buy Tokens
+          </button>
+          {/* No success tag */}
+        </div>
+
+        <div className="flex flex-col mb-4">
+          <button
+            onClick={claimFaucet}
+            className="bg-gray-900 text-white hover:bg-gray-800 rounded-full px-12 py-2 sm:w-auto"
+          >
+            {}
+          </button>
+          {/* No success tag */}
+        </div>
         <div className="text-center">
           <h3 className="text-lg ">Total minted</h3>
 
