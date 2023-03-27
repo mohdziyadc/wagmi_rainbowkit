@@ -58,19 +58,6 @@ export default function Home() {
     args: [],
   });
 
-  const {
-    data: faucetData,
-    write: faucetToken,
-    isLoading: isFaucetLoading,
-    isSuccess: isFaucetStarted,
-    error: faucetError,
-  } = useContractWrite(faucetConfig);
-
-  // claim faucet
-  const claimFaucet = async () => {
-    await faucetToken();
-  };
-
   //Must alias it since the return type of useContractWrite is same each time
   //if not aliased we can't call other write function.
   const {
@@ -88,6 +75,14 @@ export default function Home() {
     isSuccess: isBuySuccess,
     error: buyError,
   } = useContractWrite(buyConfig);
+
+  const {
+    data: faucetData,
+    write: faucetToken,
+    isLoading: isFaucetLoading,
+    isSuccess: isFaucetStarted,
+    error: faucetError,
+  } = useContractWrite(faucetConfig);
 
   const { isSuccess: mintSuccess, isLoading: mintLoading } =
     useWaitForTransaction({
@@ -112,6 +107,11 @@ export default function Home() {
     functionName: "totalSupply",
     watch: true,
   });
+
+  // claim faucet
+  const claimFaucet = async () => {
+    await faucetToken();
+  };
 
   useEffect(() => {
     if (totalSupplyData) {
@@ -156,6 +156,17 @@ export default function Home() {
                 )}
               </button>
             </div>
+            {mintSuccess && (
+              <div className="text-center">
+                Minting Success. Check out{" "}
+                <a
+                  href={`https://mumbai.polygonscan.com/tx/${mintData?.hash}`}
+                  className="underline"
+                >
+                  Polyscan
+                </a>
+              </div>
+            )}
             <div className="flex flex-col mb-4 mt-4">
               <button
                 onClick={() => {
@@ -173,6 +184,17 @@ export default function Home() {
               </button>
               {/* No success tag */}
             </div>
+            {buySuccess && (
+              <div className="text-center">
+                Tokens Bought. Check out{" "}
+                <a
+                  href={`https://mumbai.polygonscan.com/tx/${buyData?.hash}`}
+                  className="underline"
+                >
+                  Polyscan
+                </a>
+              </div>
+            )}
 
             <div className="flex flex-col mb-4">
               <button
@@ -180,23 +202,36 @@ export default function Home() {
                 className="bg-gray-900 text-white hover:bg-gray-800 rounded-full px-12 py-2 sm:w-auto"
               >
                 {faucetSuccess ? (
-                  <p> Claimed</p>
+                  <p>Claimed</p>
                 ) : isFaucetLoading || faucetLoading ? (
                   <p>Claiming...</p>
+                ) : faucetError ? (
+                  <p>Claim Failed</p>
                 ) : (
                   <p>Claim Faucet</p>
                 )}
               </button>
               {/* No success tag */}
             </div>
+            {faucetSuccess && (
+              <div className="text-center">
+                Faucet Claimed. Check out{" "}
+                <a
+                  href={`https://mumbai.polygonscan.com/tx/${faucetData?.hash}`}
+                  className="underline"
+                >
+                  Polyscan
+                </a>
+              </div>
+            )}
+
+            <div className="text-center">
+              <h3 className="text-lg ">Total minted</h3>
+
+              <h3 className="text-lg">{supplyData}</h3>
+            </div>
           </>
         )}
-
-        <div className="text-center">
-          <h3 className="text-lg ">Total minted</h3>
-
-          <h3 className="text-lg">{supplyData}</h3>
-        </div>
       </div>
     </>
   );
