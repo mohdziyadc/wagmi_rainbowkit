@@ -100,6 +100,12 @@ export default function Home() {
       hash: faucetData?.hash,
     });
 
+  const { isSuccess: buySuccess, isLoading: buyLoading } =
+    useWaitForTransaction({
+      confirmations: 1,
+      hash: buyData?.hash,
+    });
+
   const { data: totalSupplyData } = useContractRead({
     address: CONTRACT_ADDRESS,
     abi: TokenContract.abi,
@@ -131,46 +137,61 @@ export default function Home() {
         </h3>
 
         {isDefinitelyConnected && (
-          <div className="flex flex-col">
-            <button
-              onClick={() => {
-                mintToken();
-                console.log(mintData);
-              }}
-              className="bg-blue-900 text-white hover:bg-gray-800 rounded-full px-12 py-2 sm:w-auto"
-              disabled={isMintLoading}
-            >
-              {mintSuccess ? (
-                <p>Minted Successfully!</p>
-              ) : isMintLoading || mintLoading ? (
-                <p>Minting....</p>
-              ) : (
-                <p>Mint Tokens</p>
-              )}
-            </button>
-          </div>
-        )}
-        <div className="flex flex-col mb-4 mt-4">
-          <button
-            onClick={() => {
-              buyToken();
-            }}
-            className="bg-gray-900 text-white hover:bg-gray-800 rounded-full px-12 py-2 sm:w-auto"
-          >
-            Buy Tokens
-          </button>
-          {/* No success tag */}
-        </div>
+          <>
+            <div className="flex flex-col">
+              <button
+                onClick={() => {
+                  mintToken();
+                  console.log(mintData);
+                }}
+                className="bg-blue-900 text-white hover:bg-gray-800 rounded-full px-12 py-2 sm:w-auto"
+                disabled={isMintLoading}
+              >
+                {mintSuccess ? (
+                  <p>Minted Successfully!</p>
+                ) : isMintLoading || mintLoading ? (
+                  <p>Minting....</p>
+                ) : (
+                  <p>Mint Tokens</p>
+                )}
+              </button>
+            </div>
+            <div className="flex flex-col mb-4 mt-4">
+              <button
+                onClick={() => {
+                  buyToken();
+                }}
+                className="bg-gray-900 text-white hover:bg-gray-800 rounded-full px-12 py-2 sm:w-auto"
+              >
+                {buySuccess ? (
+                  <p>Bought Tokens</p>
+                ) : buyLoading || isBuying ? (
+                  <p>Buying...</p>
+                ) : (
+                  <p>Buy Tokens</p>
+                )}
+              </button>
+              {/* No success tag */}
+            </div>
 
-        <div className="flex flex-col mb-4">
-          <button
-            onClick={claimFaucet}
-            className="bg-gray-900 text-white hover:bg-gray-800 rounded-full px-12 py-2 sm:w-auto"
-          >
-            {}
-          </button>
-          {/* No success tag */}
-        </div>
+            <div className="flex flex-col mb-4">
+              <button
+                onClick={claimFaucet}
+                className="bg-gray-900 text-white hover:bg-gray-800 rounded-full px-12 py-2 sm:w-auto"
+              >
+                {faucetSuccess ? (
+                  <p> Claimed</p>
+                ) : isFaucetLoading || faucetLoading ? (
+                  <p>Claiming...</p>
+                ) : (
+                  <p>Claim Faucet</p>
+                )}
+              </button>
+              {/* No success tag */}
+            </div>
+          </>
+        )}
+
         <div className="text-center">
           <h3 className="text-lg ">Total minted</h3>
 
