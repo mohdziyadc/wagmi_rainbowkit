@@ -12,13 +12,15 @@ import {
 } from "wagmi";
 import { ethers } from "ethers";
 import { useState, useEffect } from "react";
-import TokenContract from "../../artifacts/contracts/MyToken.sol/MyToken.json";
+import TokenContract from "../contracts/tokenContract.json";
 
 export default function Home() {
   const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
   const [isDefinitelyConnected, setIsDefinitelyConnected] = useState(false);
   const { address, isConnected } = useAccount();
   const [supplyData, setSupplyData] = useState(0);
+
+  console.log("Token Contract: ", TokenContract);
 
   //To avoid hydration error caused by the useAccount hook.
   useEffect(() => {
